@@ -1,80 +1,86 @@
 FORMAT: 1A
-HOST: https://polls.apiblueprint.org/
+HOST: http://0.0.0.0
 
 # senao-sc
 
-Polls is a simple API allowing consumers to view polls and vote in them.
+HTTP APIs for Account and Password Management
 
-## Questions Collection [/questions]
+## API 1 [/users]
 
-### List All Questions [GET]
+### Find all users [GET]
+`/users`
++ Response 200 (application/json)
+    + Body
+            [
+                {
+                    "u_id": "a5f5b8b8-458e-42bb-af73-65e11cb321d1",
+                    "account": "sandy",
+                    "password": "Sandy123"
+                }
+            ]
 
+### Find one user [GET/users/a5f5b8b8-458e-42bb-af73-65e11cb321d1]
+`/users/{id}`
 + Response 200 (application/json)
 
-        [
+    + Body
             {
-                "question": "Favourite programming language?",
-                "published_at": "2015-08-05T08:40:51.620Z",
-                "choices": [
-                    {
-                        "choice": "Swift",
-                        "votes": 2048
-                    }, {
-                        "choice": "Python",
-                        "votes": 1024
-                    }, {
-                        "choice": "Objective-C",
-                        "votes": 512
-                    }, {
-                        "choice": "Ruby",
-                        "votes": 256
-                    }
-                ]
+                "Success": true
             }
-        ]
 
-### Create a New Question [POST]
-
-You may create your own question using this action. It takes a JSON
-object containing a question and a collection of answers in the
-form of choices.
-
+### Create a user [POST]
+`/users/{id}`
 + Request (application/json)
 
         {
-            "question": "Favourite programming language?",
-            "choices": [
-                "Swift",
-                "Python",
-                "Objective-C",
-                "Ruby"
-            ]
+            "account": "amber",
+            "password": "Amber123"
         }
 
 + Response 201 (application/json)
 
-    + Headers
+    + Body
 
-            Location: /questions/2
+            {
+                "Success": true
+            }
+            
+
+### Modify a user [PUT/users/a5f5b8b8-458e-42bb-af73-65e11cb321d1]
+`/users/{id}`
++ Request (application/json)
+
+        {
+            "account": "sandy_new",
+            "password": "Sandy123_new"
+        }
+
++ Response 204 (application/json)
+
+### Delete a user [DELETE/users/a5f5b8b8-458e-42bb-af73-65e11cb321d1]
+`/users/{id}`
++ Response 200 (application/json)
+    
+    + Body
+            {
+                "Success": true
+            }
+
+
+## API 2 [/auth]
+### Verify the user [POST]
+`/auth`
++ Request (application/json)
+
+        {
+            "account": "sandy",
+            "password": "Sandy123"
+        }
+
++ Response 200 (application/json)
 
     + Body
 
             {
-                "question": "Favourite programming language?",
-                "published_at": "2015-08-05T08:40:51.620Z",
-                "choices": [
-                    {
-                        "choice": "Swift",
-                        "votes": 0
-                    }, {
-                        "choice": "Python",
-                        "votes": 0
-                    }, {
-                        "choice": "Objective-C",
-                        "votes": 0
-                    }, {
-                        "choice": "Ruby",
-                        "votes": 0
-                    }
-                ]
+                "Success": true
             }
