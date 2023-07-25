@@ -12,7 +12,8 @@ app = FastAPI()
 
 db: List[User] = [
 	User(
-		u_id = uuid4(),
+		# u_id = uuid4(),
+        u_id = UUID('a5f5b8b8-458e-42bb-af73-65e11cb321d1'),
 		account = 'sandy',
 		password = 'Sandy123'
 	),
@@ -46,9 +47,10 @@ async def user_create(user:User):  # User comes from POST Request Body we gave
 @app.put('/users/{u_id}', status_code=204)
 async def user_update(new_user: UserUpdate, u_id: UUID):
     for current_user in db:
+        if new_user.account == current_user.account:
+            raise HTTPException(status_code=400, detail=f'The account is already in use.')
+    for current_user in db:
         if current_user.u_id == u_id:
-            if new_user.account == current_user.account:
-                raise HTTPException(status_code=400, detail=f'The account is already in use.')
             if current_user.account is not None:
                 current_user.account = new_user.account
             if current_user.password is not None:
