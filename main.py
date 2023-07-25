@@ -3,10 +3,9 @@ from typing import List
 from models import User, UserUpdate
 from uuid import UUID, uuid4
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse, PlainTextResponse
+from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from starlette.exceptions import HTTPException as StarletteHTTPException
-from requests.exceptions import HTTPError
 from datetime import datetime, timedelta
 
 app = FastAPI()
@@ -51,9 +50,9 @@ async def user_update(new_user: UserUpdate, u_id: UUID):
                 user.password = new_user.password
 
             return
-    
+    # Raise Error when the user is not in the DB 
     raise HTTPException(
-		status_code=404, # 404: Client Error, URL is not recognized
+		status_code=404,
   		detail=f'User with id "{u_id}" does not exist!'	
 	)
                 
@@ -66,16 +65,17 @@ async def user_delete(u_id: UUID):
             db.remove(user)
             return
     # Raise Error when the user is not in the DB
-    raise HTTPException(status_code=404, detail=f'User with id "{u_id}" does not exist!')
+    raise HTTPException(
+        status_code=404,
+        detail=f'User with id "{u_id}" does not exist!'
+    )
 
-#######################################################################
-# global attempts
 attempts = 0
 now_plus_1_min = None
 
 @app.post('/auth', status_code=200)
 async def auth(user:User):
-    global attempts  #without this, "attempts" in the function is local
+    global attempts
     global now_plus_1_min
     for data in db:
         if data.account == user.account:
@@ -98,8 +98,7 @@ def wait_for_one_min():
     now = datetime.now()
     
     if not now_plus_1_min:
-        # now_plus_1_min = now + timedelta(minutes = 1)
-        now_plus_1_min = now + timedelta(seconds= 3)
+        now_plus_1_min = now + timedelta(minutes = 1)
         
     if now >= now_plus_1_min:
         attempts = 1
@@ -109,11 +108,11 @@ def wait_for_one_min():
         time_to_wait = round((now_plus_1_min-now).total_seconds())
         raise HTTPException(
             status_code=429,
-            detail='You failed too many times, Please wait {} sec to retry.'.format(time_to_wait))
+            detail='You failed too many times, Please wait {} sec to retry.'.format(time_to_wait)
+        )
     
-#######################################################################
 
-
+# Override HTTPException
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request, exc):
     return JSONResponse(
