@@ -45,12 +45,14 @@ async def user_create(user:User):  # User comes from POST Request Body we gave
 # # Modify a user
 @app.put('/users/{u_id}', status_code=204)
 async def user_update(new_user: UserUpdate, u_id: UUID):
-    for user in db:
-        if user.u_id == u_id:
-            if user.account is not None:
-                user.account = new_user.account
-            if user.password is not None:
-                user.password = new_user.password
+    for current_user in db:
+        if current_user.u_id == u_id:
+            if new_user.account == current_user.account:
+                raise HTTPException(status_code=400, detail=f'The account is already in use.')
+            if current_user.account is not None:
+                current_user.account = new_user.account
+            if current_user.password is not None:
+                current_user.password = new_user.password
 
             return
     # Raise Error when the user is not in the DB 
