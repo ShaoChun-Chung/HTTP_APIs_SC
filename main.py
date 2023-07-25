@@ -36,6 +36,9 @@ async def users_get_one(u_id: UUID):
 # Add a user
 @app.post('/users', status_code=201)
 async def user_create(user:User):  # User comes from POST Request Body we gave
+    for current_user in db:
+        if user.account == current_user.account:
+            raise HTTPException(status_code=400, detail=f'The account is already in use.')
     db.append(user)
     return {"Success" : True}
 

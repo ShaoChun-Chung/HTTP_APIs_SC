@@ -33,7 +33,7 @@ class User(BaseModel):
     password: str
     
     normalized_account = field_validator('account')(len_constraints_account)
-    
+   
     password = field_validator('password')(len_constraints_password)
     normalized_password = field_validator('password')(contain_constraints_password)
     
@@ -43,6 +43,6 @@ class UserUpdate(BaseModel):
     password: Optional[str]
     
     normalized_account = field_validator('account')(len_constraints_account)
-    
+ 
     password = field_validator('password')(len_constraints_password)
     normalized_password = field_validator('password')(contain_constraints_password)
